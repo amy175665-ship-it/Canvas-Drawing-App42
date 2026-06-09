@@ -5,18 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canvas Drawing App</title>
     <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            min-height: 100vh;
+            background-color: #b3b3b39f; 
+        }
         #toolbar {
             color: white;
-            width: 50%;
+            width: 800px; /* 캔버스 너비와 동일하게 설정 */
             height: 60px;
-            background-color: #2D4A3E; 
+            background-color: #303f39; 
             display: flex;
             justify-content: center; 
             align-items: center;
             gap: 25px; 
-            margin: 20px auto 0 auto;
+            margin: 20px auto 10px auto;
             border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         #toolbar .controls {
@@ -35,7 +42,7 @@
 
         #toolbar button {
             border: none;
-            background-color: #1A2E26;
+            background-color: #456d5e;
             color: #E8F5E9;
             padding: 6px 16px;
             cursor: pointer;
@@ -45,12 +52,21 @@
         }
 
         #toolbar button:hover {
-            background-color: #3D6655;
+            color: #456d5e;
+            background-color: #E8F5E9;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         canvas {
-            display: block;
+            width: 800px;
+            height: 700px;
+            border-radius: 15px;
+            background-color: white;
+
+            background-image: url("https://i.pinimg.com/736x/9b/0a/23/9b0a23ac0817808ff976defd30077940.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
     </style>
 </head>
@@ -77,14 +93,15 @@
         const toolbar = document.getElementById("toolbar")
         const bgColorInput = document.getElementById("bgColor")
 
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight - toolbar.offsetHeight
+        // 캔버스 해상도 설정
+        canvas.width = 800;
+        canvas.height = 700;
 
         const ctx = canvas.getContext("2d")
         let isDrawing = false
         let lineWidth = 2
 
-        // 초기 배경색 및 스타일
+        // 초기 스타일
         canvas.style.backgroundColor = bgColorInput.value
         ctx.lineCap = 'round'
 
@@ -101,23 +118,18 @@
         });
 
         toolbar.addEventListener("click", function(e){
-            // 지우기 기능
             if(e.target.id === "reset"){
                 ctx.clearRect(0, 0, canvas.width, canvas.height)
             }
             
-            // 다운로드 기능
             if(e.target.id === "downfile"){
                 const tempCanvas = document.createElement("canvas")
                 tempCanvas.width = canvas.width
                 tempCanvas.height = canvas.height
                 const tempCtx = tempCanvas.getContext("2d")
 
-                // 배경색 채우기
                 tempCtx.fillStyle = bgColorInput.value
                 tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
-                
-                // 기존 그림 복사
                 tempCtx.drawImage(canvas, 0, 0)
 
                 const link = document.createElement("a")
@@ -130,13 +142,15 @@
         canvas.addEventListener("mousedown", (e) => {
             isDrawing = true
             ctx.beginPath()
-            ctx.moveTo(e.clientX, e.clientY - toolbar.offsetHeight)
+            const rect = canvas.getBoundingClientRect()
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top)
         })
 
         canvas.addEventListener("mousemove", (e) => {
             if(!isDrawing) return
             ctx.lineWidth = lineWidth
-            ctx.lineTo(e.clientX, e.clientY - toolbar.offsetHeight)
+            const rect = canvas.getBoundingClientRect()
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top)
             ctx.stroke()
         })
 
